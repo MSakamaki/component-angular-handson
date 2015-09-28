@@ -42,11 +42,10 @@
 
 ### End to End Test 編
 
- 1. protractorのインストール
- 1. protractorサンプルの実行
+ 1. protractorのインストールと更新
  1. page objectの実装
- 1. serviceの実装
  1. テストケース実装
+ 1. テストの実行
 
 ## 環境構築
 
@@ -942,6 +941,15 @@ describe('Main View', function() {
 });
 
 ```
+
+#### テストの実行
+
+以下のコマンドでe2eテストの実行が可能。
+
+```sh
+grunt test:e2e
+```
+
 
 同様に以下のようなテストケースを書いてみよう。
 
