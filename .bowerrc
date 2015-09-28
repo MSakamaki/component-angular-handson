@@ -1,0 +1,4 @@
+{
+    "registry": "http://localhost:5678",
+    "directory": "client/bower_components"
+}

@@ -1,0 +1,33 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<form class="form-horizontal" novalidate ng-submit="register()" name="eventform">
+  <div class="form-group">
+    <label for="inputEmail3" class="col-sm-2 control-label">イベント名</label>
+    <div class="col-sm-10">
+      <input class="form-control" placeholder="入力例：）AngularHandsOn" name="name"
+        ng-model="name" required>
+      <span class="text-danger"ng-show="eventform.name.$error.required">必須です。</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="inputPassword3" class="col-sm-2 control-label">イベント詳細</label>
+    <div class="col-sm-10">
+      <input class="form-control" placeholder="入力例：）Angularの体験学習を行います。" name="detail"
+        ng-model="detail" required>
+      <span class="text-danger"ng-show="eventform.detail.$error.required">必須です。</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button ng-disabled="eventform.$invalid" type="submit" class="btn btn-default">登録</button>
+    </div>
+  </div>
+</form>
+
+<footer class="footer">
+  <div class="container">
+      <p>Angular Fullstack v2.1.1 |
+        <a href="https://twitter.com/tyhenkel">@tyhenkel</a> |
+         <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a></p>
+  </div>
+</footer>

@@ -1,0 +1,32 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container">
+
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Events:</h1>
+      <div class="form-group">
+        <label class="control-label"> イベント検索(ID)</label>
+        <input class="form-control" ng-model="eventfilter"/>
+        <button class="btn btn-info" ng-click="search()">検索</button>
+        <button class="btn btn-info" ng-click="allSearch()">全部取得</button>
+      </div>
+      <event-tags></event-tags>
+      <ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6"
+          ng-repeat="event in eventData.event.get() | filter:eventData.tag.filter()">
+        <li>
+          <a>{{event.name}}</a>
+          <em ng-bind="event.no"></em> : <small>{{event.detail}} to TAG:{{event.tag}}</small>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+      <p>Angular Fullstack v2.1.1 |
+        <a href="https://twitter.com/tyhenkel">@tyhenkel</a> |
+         <a href="https://github.com/DaftMonk/generator-angular-fullstack/issues?state=open">Issues</a></p>
+  </div>
+</footer>
