@@ -54,6 +54,7 @@
 #### nodeJSのインストール
 
  + [公式ページ参照](https://nodejs.org/)
+ + [git](https://git-scm.com/download/win)のインストールが必要です。
 
 #### javaのインストール
 
@@ -62,6 +63,7 @@
 ### angular fullstackのインストール
 
  + [公式ページ参照](https://github.com/DaftMonk/generator-angular-fullstack#usage)
+ + Windowsの場合[python](https://www.python.org/downloads/)もインストールしてください。
 
 ## 簡単なAngularアプリケーションの作成
 
