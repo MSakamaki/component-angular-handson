@@ -757,7 +757,7 @@ privateなので[globalのbower](http://bower.io/search/?q=sample-sheard-service
 データ共有コンポーネントを使う為に、以下のコマンドを実行する。
 
 ```sh
-bower install -save [データ共有コンポーネントのパッケージ名]
+bower install -save [データ共有コンポーネントのパッケージ名] [tau UIコンポーネントのパッケージ名]
 ```
 
 #### モジュール名の修正
