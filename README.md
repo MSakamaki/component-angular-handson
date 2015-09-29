@@ -65,6 +65,9 @@
 
 ## 簡単なAngularアプリケーションの作成
 
+ + イベント一覧を表示、検索、フィルタできる。
+ + [時間があれば]イベントの登録ができる。
+
 ### template モジュールの作成
 
 ```sh
@@ -75,7 +78,11 @@ cd example
 
 # テンプレートの展開
 yo angular-fullstack example
+```
 
+![angular fullstack 初期設定](images/setting.png)
+
+```sh
 # プロジェクトの実行、コレで画面が立ち上がる。
 grunt serve
 ```
@@ -83,6 +90,8 @@ grunt serve
 ### 検索処理とAPI、画面の実装
 
 #### apiの追加
+
+サーバー側のAPI(モックAPI)を作成する。
 
 [angular-fullstack](https://github.com/DaftMonk/generator-angular-fullstack#endpoint)専用のコマンドを利用して作成する。
 
@@ -107,7 +116,7 @@ server/
 ```
 
  + `events.controller.js`と`index.js`を編集する。
- + get, postも作成しておく。
+ + getだけでなく、後に使うpostも作成しておく。
 
 ##### `events.controller.js`
 
@@ -134,13 +143,14 @@ var data = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
     };
   });
 
-// Get list of eventss
+// 全検索
 exports.index = function(req, res) {
   res.json({
     data:data
   });
 };
 
+// ID検索
 exports.search = function(req, res) {
   console.log('search', req.params.eventId );
   res.json({
@@ -150,6 +160,7 @@ exports.search = function(req, res) {
   });
 };
 
+// 登録
 exports.create = function(req, res) {
   console.log('create', req.body );
   data.push((function(){
@@ -185,7 +196,6 @@ module.exports = router;
 
  + 作成できていれば[http://localhost:9000/api/events](http://localhost:9000/api/events)にアクセスすると、JSONデータが表示される。
 
-
 #### controllerの修正
 
  + 画面を修正して行く。
@@ -195,7 +205,6 @@ module.exports = router;
 修正内容は`things`を`event`に変更
 
 ```javascript
-
 
 angular.module('exampleApp')
   .controller('MainCtrl', function ($scope, $http) {
@@ -628,7 +637,21 @@ angular.module('exampleApp')
 
 ## コンポーネント編
 
-> TODO: 設計図
+#### ここ迄作成したアプリのイメージ
+
+ここまでは単一アプリとして作成してきました。
+
+`/api/eevnts`から取得したデータをcontrollerで保持し、画面に表示しています。
+
+![](images/simpleapp.png)
+
+#### 今回作成するイメージ
+
+今回は新たにデータを共有する共通コンポーネントと、その共通コンポーネントに依存した形の`tag UI`コンポーネントを作成します。
+
+![](images/componentApp.png)
+
+ + * `tag UI`は`Sheard Data (component)`に依存している。
 
 ### 初期設定
 
@@ -668,6 +691,7 @@ grunt build
 
  + モジュール名は`app.component.events`で作成
  + [完成版](https://github.com/MSakamaki/sample-sheard-service)
+ + コンポーネント間でのデータ共有方法は色々有るが、今回はSheard Serviceを作成する。
 
 #### モジュール名の修正
 
@@ -856,9 +880,19 @@ angular.module('exampleApp')
  + `ng-repeat="event in events"`を`ng-repeat="event in eventData.event.get() | filter:eventData.tag.filter()"`に変更する。
 
 
+##### おまけ
+
+AngularのFilter機能を体験してもらう為にこのような形にしましたが、
+本来であれば`ng-repeat="event in eventData.event.get() | filter:eventData.tag.filter()"`にしなくても、
+`app.component.events.sheard.service`に`eventData.event.getFilter()`等を作成してフィルタした物が取得できるようにした方がより良い作りです。
+
 ## End to End Testing
 
 `angular-fullstack`にもprotractorはインストールされているが、深く理解するためゼロベースで構築＆実行する。
+
+[Page Object パターン](https://code.google.com/p/selenium/wiki/PageObjects)で作成して行きます。
+
+
 
 ### protractorのインストールと実行
 
@@ -874,9 +908,9 @@ node_modules/grunt-protractor-runner/node_modules/protractor/bin/webdriver-manag
 grunt test:e2e
 ```
 
-テストは落ちるが、それは大幅な改修を加えたため。
+現時点で実行するとテストは落ちるが、それは大幅な改修を加えたためです。
 
-今回の修正に合わせてe2eテストをミニマムに修正して行く。
+今回の修正に合わせてe2eテストを修正し、動作するようにしましょう。
 
 ```sh
 e2e/
@@ -890,6 +924,20 @@ e2e/
 
 `e2e/main/main.po.js`の実装
 
+ + protractorのAPIは[APIドキュメント](https://angular.github.io/protractor/#/api)参照
+
+##### テストの大きな流れとしては
+
+
+ 1. PageObject作成
+   + element(画面項目）の実装
+   + verification(表示確認)の実装
+   + service(画面の振る舞い)の実装
+ 1. テストケースの実装
+   + シナリオを書く
+   + テスト処理の実装
+ 1. テストの実行
+
 ```sh
 /**
  * This file uses the Page Object pattern to define the main page for tests
@@ -899,10 +947,21 @@ e2e/
 'use strict';
 
 var MainPage = function() {
+  /** elementの実装 */
   this.inputEventfilter = element(by.model('eventfilter'));
   this.btnSearch = element(by.css('button[ng-click="search()"]'));
-  this.listEvents = element.all(by.repeater('event in eventData.event.get() | filter:eventData.tag.filter()'));//element.all(by.repeater('event in eventData.event.get() | filter:eventData.tag.filter()'));
+  this.listEvents = element.all(by.repeater('event in eventData.event.get() | filter:eventData.tag.filter()'));
 
+  /** page verificationの実装 */
+  this.verification = function(){
+    var _elm = this;
+    return Promise.all([
+        (function(){ return browser.wait(function() {return _elm.inputEventfilter.isPresent(); }, 10000); })(),
+        (function(){ return browser.wait(function() {return _elm.btnSearch.isPresent(); }, 10000); })()
+      ]);
+  }
+
+  /** serviceの実装 */
   this.eventSearch = function(eventNo){
     var mainPage  = new MainPage();
     return browser.wait(function(){
@@ -915,6 +974,7 @@ var MainPage = function() {
 };
 
 module.exports = new MainPage();
+
 ```
 
 #### テストケース実装
@@ -928,30 +988,63 @@ describe('Main View', function() {
   var page;
 
   beforeEach(function() {
+    /* ルートページにアクセス(URLはprotractor.conf.jsのbaseUrlに設定されている) */
     browser.get('/');
+
+    /* page objectをimport */
     page = require('./main.po');
   });
 
   it('10を設定してフィルタ検索すると、最初の１行目にevent10が表示される', function(done) {
-    page.eventSearch(10).then(function(){
-      expect(page.listEvents.get(0).getText()).toBe('event10\n10 : the event no 10 to TAG:bazz');
-      done();
+
+    /** Page Verification によりそのPage Objectが正しく表示されている事を確認する */
+    page.verification().then(function(){
+
+      /** service eventSearch()を使って、10で検索を行う */
+      return page.eventSearch(10);
+    }).then(function(){
+
+      /** 検索結果elementの１行目のテキスト文字が'10'である事を確認する */
+      return expect(page.listEvents.get(0).getText()).toBe('10');
+    }).then(function(){
+
+      /** テストが完了した事をjasmine(テストフレームワーク)に通知 */
+      return done();
     });
   });
 });
 
 ```
 
-#### テストの実行
+#### テストを実行する
 
-以下のコマンドでe2eテストの実行が可能。
+以下のコマンドでe2eテストの実行が可能できます、実行してみましょう。
+
 
 ```sh
 grunt test:e2e
 ```
 
+![](images/e2eng.png)
 
-同様に以下のようなテストケースを書いてみよう。
+テストが失敗すると思います。
+
+これは`expect(page.listEvents.get(0).getText()).toBe('10');`の条件、`.toBe('10')`が間違っているからです。
+
+テストを正常に完了させる為に、`expect`を以下のように修正しましょう。
+
+
+```javascript
+expect(page.listEvents.get(0).getText())
+  .toBe('event10\n10 : the event no 10 to TAG:bazz');
+```
+
+![](images/e2eok.png)
+
+
+テストを`grunt test:e2e`で実行し、正常に完了すれば完了です。
+
+#### *[おまけ]* 以下のようなテストケースを書いてみましょう。
 
  1. 全検索を行って、tagでフィルタする
  1. イベントの新規登録(作成していれば)
