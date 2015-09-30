@@ -898,7 +898,6 @@ AngularのFilter機能を体験してもらう為にこのような形にしま�
 
 ### protractorのインストールと実行
 
-[generator-protractor](https://www.npmjs.com/package/generator-protractor)を使用する。
 
  + コマンド
 
@@ -927,6 +926,7 @@ e2e/
 `e2e/main/main.po.js`の実装
 
  + protractorのAPIは[APIドキュメント](https://angular.github.io/protractor/#/api)参照
+ + protractor.conf.jsは[テンプレート](https://github.com/angular/protractor/blob/master/docs/referenceConf.js)参照
 
 ##### テストの大きな流れとしては
 
