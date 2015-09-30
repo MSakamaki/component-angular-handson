@@ -750,7 +750,7 @@ privateなので[globalのbower](http://bower.io/search/?q=sample-sheard-service
 
 ### tag ui componentを作る
 
- + モジュール名は`app.component.events`で作成
+ + モジュール名は`app.component.events.directive`で作成
  + [完成版](https://github.com/MSakamaki/my-event-tags)
  + 先ほど作ったデータ共有コンポーネントを使う。
 
